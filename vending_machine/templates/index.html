@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Vending Machine Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+
+        :root {
+            --ink: #16211b;
+            --muted: #6b7a72;
+            --line: #e3e8e4;
+            --bg: #f3f5f2;
+            --panel: #ffffff;
+            --brand: #0f5132;
+            --brand-light: #e7f3ec;
+            --accent: #d97b2e;
+            --good: #1a7d4a;
+            --low: #c07a00;
+            --out: #b23b3b;
+            --radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: var(--brand);
+            color: #eef6f0;
+            padding: 22px clamp(16px, 4vw, 44px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.14);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .header p {
+            margin: 2px 0 0;
+            color: #bcd8c7;
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: clamp(16px, 4vw, 36px);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 34px;
+        }
+
+        .summary-card {
+            background: var(--panel);
+            padding: 22px 24px;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+        }
+
+        .summary-title {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-top: 6px;
+        }
+
+        .summary-sub {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .section {
+            margin-bottom: 36px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 14px;
+            color: var(--ink);
+        }
+
+        /* STOCK CARDS */
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .stock-card {
+            background: var(--panel);
+            padding: 18px;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+        }
+
+        .stock-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 100px;
+        }
+
+        .badge.good {
+            color: var(--good);
+            background: #e6f4ec;
+        }
+
+        .badge.low {
+            color: var(--low);
+            background: #fbedd6;
+        }
+
+        .badge.out {
+            color: var(--out);
+            background: #f8e5e5;
+        }
+
+        .stock-number {
+            font-size: 28px;
+            font-weight: 800;
+            margin-top: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .stock-number span {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        .price {
+            color: var(--muted);
+            margin-top: 4px;
+            font-size: 13px;
+        }
+
+        .stock-bar {
+            height: 6px;
+            background: #edf1ee;
+            border-radius: 10px;
+            margin-top: 14px;
+            overflow: hidden;
+        }
+
+        .stock-fill {
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .stock-fill.good {
+            background: var(--good);
+        }
+
+        .stock-fill.low {
+            background: var(--low);
+        }
+
+        .stock-fill.out {
+            background: var(--out);
+        }
+
+        /* MANAGE */
+
+        .manage-box {
+            background: var(--panel);
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+            overflow: hidden;
+        }
+
+        .manage-row {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .manage-row:last-child {
+            border-bottom: none;
+        }
+
+        .manage-product {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f6f7f5;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 4px 4px 4px 12px;
+        }
+
+        .field label {
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        input {
+            padding: 8px 4px;
+            width: 72px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--ink);
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        button {
+            padding: 9px 14px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            color: white;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity 0.15s ease;
+        }
+
+        button:hover {
+            opacity: 0.88;
+        }
+
+        button:focus-visible {
+            outline: 2px solid var(--ink);
+            outline-offset: 2px;
+        }
+
+        .add-btn {
+            background: var(--good);
+        }
+
+        .remove-btn {
+            background: var(--out);
+        }
+
+        .set-btn {
+            background: #2b5fa8;
+        }
+
+        .price-btn {
+            background: var(--accent);
+        }
+
+        /* TABLES */
+
+        .table-box {
+            background: var(--panel);
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 480px;
+        }
+
+        th, td {
+            padding: 13px 18px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8faf8;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-pill {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 100px;
+        }
+
+        .status-pill.success {
+            color: var(--good);
+            background: #e6f4ec;
+        }
+
+        .status-pill.failed {
+            color: var(--out);
+            background: #f8e5e5;
+        }
+
+        .empty-row td {
+            color: var(--muted);
+            text-align: center;
+            padding: 28px;
+        }
+
+        @media (max-width: 900px) {
+
+            .stock-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .stock-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .field {
+                justify-content: space-between;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    <div class="header-title">
+
+        <div class="header-mark">🥤</div>
+
+        <div>
+            <h1>Vending Machine</h1>
+            <p>Admin dashboard</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="container">
+
+
+    <!-- SUMMARY -->
+
+    <div class="summary">
+
+        <div class="summary-card">
+
+            <div class="summary-title">Total sales</div>
+            <div class="summary-value">{{ total_sales }}</div>
+            <div class="summary-sub">Successful transactions</div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">Total revenue</div>
+            <div class="summary-value">
+                {{ total_revenue }}
+                <span style="font-size:16px; font-weight:600; color: var(--muted);">
+                    BAHT
+                </span>
+            </div>
+            <div class="summary-sub">From successful sales</div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- PRODUCT STOCK -->
+
+    <div class="section">
+
+        <div class="section-title">Product stock</div>
+
+
+        <div class="stock-grid">
+
+            {% for product in products %}
+
+            {% set stock = product[2] %}
+
+            {% if stock == 0 %}
+
+                {% set level = "out" %}
+                {% set level_label = "Out of stock" %}
+
+            {% elif stock <= 3 %}
+
+                {% set level = "low" %}
+                {% set level_label = "Low stock" %}
+
+            {% else %}
+
+                {% set level = "good" %}
+                {% set level_label = "In stock" %}
+
+            {% endif %}
+
+
+            <div class="stock-card">
+
+                <div class="stock-top">
+
+                    <div class="product-name">
+                        Product {{ product[0] }}
+                    </div>
+
+                    <div class="badge {{ level }}">
+                        {{ level_label }}
+                    </div>
+
+                </div>
+
+
+                <div class="stock-number">
+                    {{ product[2] }}
+                    <span>items</span>
+                </div>
+
+
+                <div class="price">
+                    Price: {{ product[1] }} BAHT
+                </div>
+
+
+                <div class="stock-bar">
+
+                    <div
+                        class="stock-fill {{ level }}"
+                        style="width: {{ [product[2] * 10, 100] | min }}%;"
+                    >
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+
+    <!-- STOCK MANAGEMENT -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Manage stock &amp; price
+        </div>
+
+
+        <div class="manage-box">
+
+
+            {% for product in products %}
+
+            <div class="manage-row">
+
+
+                <div class="manage-product">
+                    Product {{ product[0] }}
+                </div>
+
+
+                <div class="form-group">
+
+
+                    <!-- ADD -->
+
+                    <form action="/add_stock"
+                          method="POST"
+                          class="field">
+
+                        <input type="hidden"
+                               name="product"
+                               value="{{ product[0] }}">
+
+                        <label for="add-{{ product[0] }}">
+                            Add
+                        </label>
+
+                        <input
+                            id="add-{{ product[0] }}"
+                            type="number"
+                            name="amount"
+                            min="1"
+                            value="1"
+                        >
+
+                        <button type="submit"
+                                class="add-btn">
+                            Add stock
+                        </button>
+
+                    </form>
+
+
+                    <!-- REMOVE -->
+
+                    <form action="/decrease_stock"
+                          method="POST"
+                          class="field">
+
+                        <input type="hidden"
+                               name="product"
+                               value="{{ product[0] }}">
+
+                        <label for="rem-{{ product[0] }}">
+                            Remove
+                        </label>
+
+                        <input
+                            id="rem-{{ product[0] }}"
+                            type="number"
+                            name="amount"
+                            min="1"
+                            value="1"
+                        >
+
+                        <button type="submit"
+                                class="remove-btn">
+                            Remove stock
+                        </button>
+
+                    </form>
+
+
+                    <!-- SET STOCK -->
+
+                    <form action="/set_stock"
+                          method="POST"
+                          class="field">
+
+                        <input type="hidden"
+                               name="product"
+                               value="{{ product[0] }}">
+
+                        <label for="set-{{ product[0] }}">
+                            Set to
+                        </label>
+
+                        <input
+                            id="set-{{ product[0] }}"
+                            type="number"
+                            name="stock"
+                            min="0"
+                            value="{{ product[2] }}"
+                        >
+
+                        <button type="submit"
+                                class="set-btn">
+                            Set stock
+                        </button>
+
+                    </form>
+
+
+                    
+
+                    <!--<form action="/update_price"
+                          method="POST"
+                          class="field">
+
+                        <input type="hidden"
+                               name="product"
+                               value="{{ product[0] }}">
+
+                        <label for="price-{{ product[0] }}">
+                            Price
+                        </label>
+
+                        <input
+                            id="price-{{ product[0] }}"
+                            type="number"
+                            name="price"
+                            min="10"
+                            step="10"
+                            value="{{ product[1] }}"
+                            required
+                        >
+
+                        <button type="submit"
+                                class="price-btn">
+                            Update price
+                        </button>
+
+                    </form>-->
+
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- SALES BY PRODUCT -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Sales by product
+        </div>
+
+
+        <div class="table-box">
+
+            <table>
+
+                <tr>
+
+                    <th>Product</th>
+                    <th>Units sold</th>
+
+                </tr>
+
+
+                {% for product in product_sales %}
+
+                <tr>
+
+                    <td>
+                        Product {{ product[0] }}
+                    </td>
+
+                    <td>
+                        {{ product[1] }}
+                    </td>
+
+                </tr>
+
+
+                {% else %}
+
+                <tr class="empty-row">
+
+                    <td colspan="2">
+                        No sales recorded yet
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- RECENT SALES -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Recent sales
+        </div>
+
+
+        <div class="table-box">
+
+            <table>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Time</th>
+
+                </tr>
+
+
+                {% for sale in sales %}
+
+                <tr>
+
+                    <td>
+                        {{ sale[0] }}
+                    </td>
+
+                    <td>
+                        Product {{ sale[1] }}
+                    </td>
+
+                    <td>
+                        {{ sale[2] }} BAHT
+                    </td>
+
+
+                    <td>
+
+                        {% if sale[3] == "SUCCESS" %}
+
+                        <span class="status-pill success">
+                            Success
+                        </span>
+
+                        {% else %}
+
+                        <span class="status-pill failed">
+                            Failed
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ sale[4] }}
+                    </td>
+
+                </tr>
+
+
+                {% else %}
+
+                <tr class="empty-row">
+
+                    <td colspan="5">
+                        No sales recorded yet
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
